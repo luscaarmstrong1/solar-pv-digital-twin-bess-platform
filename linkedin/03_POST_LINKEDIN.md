@@ -14,4 +14,4 @@ Resultados: geracao anual 2190.7 MWh; BESS otimo 250 kW / 750 kWh.
 
 Technologies: Python, pvlib, Pandas, FastAPI, Streamlit, Excel, SQLite, Docker.
 
-GitHub: preencher apos publicacao.
+GitHub: https://github.com/luscaarmstrong1/solar-pv-digital-twin-bess-platform

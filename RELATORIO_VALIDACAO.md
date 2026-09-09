@@ -77,7 +77,7 @@ src\validation\energy_balance.py         1      0   100%
 TOTAL                                  736      5    99%
 Coverage XML written to file coverage.xml
 Required test coverage of 80% reached. Total coverage: 99.32%
-106 passed, 1 warning in 21.82s
+106 passed, 1 warning in 16.22s
 
 ```
 

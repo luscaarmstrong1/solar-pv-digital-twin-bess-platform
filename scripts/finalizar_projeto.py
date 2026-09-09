@@ -104,6 +104,7 @@ def main():
     results["validation"] = validation
     results["zip"] = str(zip_path)
     results["sha256"] = digest
+    results["github_url"] = "https://github.com/luscaarmstrong1/solar-pv-digital-twin-bess-platform"
     (ROOT / "data/portfolio/final_summary.json").write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(results, indent=2, ensure_ascii=False))
 
