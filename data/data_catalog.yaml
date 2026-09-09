@@ -1,0 +1,42 @@
+- dataset: weather
+  source: pvlib clear-sky + synthetic modifiers
+  classification: dado sintetico
+  granularity: 1 hora
+  period: 2024-2025
+  units: W/m2, C, m/s
+  description: Serie meteorologica sintetica derivada de geometria solar publica.
+- dataset: pv_timeseries
+  source: modelo fisico FV
+  classification: resultado calculado
+  granularity: 1 hora
+  period: 2024-2025
+  units: kW, kWh
+  description: Expected e measured AC/DC, clipping, curtailment e perdas.
+- dataset: load
+  source: perfil industrial ficticio
+  classification: dado sintetico
+  granularity: 1 hora
+  period: 2024-2025
+  units: kW, kWh
+  description: Carga industrial com dias uteis, fins de semana e sazonalidade.
+- dataset: fault_ground_truth
+  source: fault injection engine
+  classification: dado sintetico
+  granularity: evento
+  period: 2024-2025
+  units: kWh, h
+  description: Falhas sinteticas com ativo, periodo e perda.
+- dataset: bess_dispatch
+  source: modelo BESS
+  classification: resultado calculado
+  granularity: 1 hora
+  period: 2024-2025
+  units: kW, kWh, %
+  description: SOC, carga, descarga, importacao, exportacao e perdas.
+- dataset: economics
+  source: modelo economico configuravel
+  classification: resultado calculado
+  granularity: anual
+  period: 15 anos
+  units: BRL
+  description: CAPEX, OPEX, VPL, TIR, payback e LCOS.

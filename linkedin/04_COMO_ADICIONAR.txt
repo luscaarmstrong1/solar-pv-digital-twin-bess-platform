@@ -1,0 +1,1 @@
+Adicionar como projeto no LinkedIn usando o titulo, descricao, competencias e imagens desta pasta.

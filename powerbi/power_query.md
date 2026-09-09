@@ -1,0 +1,1 @@
+Conectar aos CSV/Parquet em data/portfolio e data/processed. Nao ha PBIX falso.

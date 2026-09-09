@@ -1,0 +1,5 @@
+Solar PV Digital Twin & BESS Optimization Platform
+
+Plataforma de Digital Twin, Performance e Otimizacao Fotovoltaica com BESS.
+
+Projeto com PV modeling, Digital Twin, Performance Ratio, losses, O&M, BESS, dispatch optimization, LCOS, Python, pvlib e Streamlit.

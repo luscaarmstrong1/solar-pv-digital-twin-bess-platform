@@ -1,0 +1,31 @@
+[project]
+name = "solar-pv-digital-twin-bess-platform"
+version = "1.0.0"
+description = "Solar PV Digital Twin, Performance Analytics, O&M and BESS Optimization Platform"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --cov=src --cov-report=term-missing --cov-report=xml --cov-fail-under=80"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["E402", "I001"]
+"src/bess/*.py" = ["F401"]
+"src/digital_twin/*.py" = ["F401"]
+"src/economics/*.py" = ["F401"]
+"src/faults/*.py" = ["F401"]
+"src/om/*.py" = ["F401"]
+"src/optimization/*.py" = ["F401"]
+"src/performance/*.py" = ["F401"]
+"src/reporting/*.py" = ["F401"]
+"src/scenarios/*.py" = ["F401"]
+"src/solar/*.py" = ["F401"]
+"src/validation/*.py" = ["F401"]

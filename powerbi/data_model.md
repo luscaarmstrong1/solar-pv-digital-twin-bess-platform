@@ -1,0 +1,1 @@
+DimPlant, DimAsset, DimInverter, DimString, DimBESS, FactWeather, FactPV, FactPerformance, FactFaults, FactBESS, FactEconomics.

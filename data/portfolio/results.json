@@ -1,0 +1,168 @@
+{
+  "plant": {
+    "plant_id": "PLANT-NEXUS-SOLAR-001",
+    "name": "NEXUS SOLAR INDUSTRIAL PLANT",
+    "country": "Brasil",
+    "city_reference": "Campinas, SP",
+    "latitude": -22.9056,
+    "longitude": -47.0608,
+    "altitude_m": 650.0,
+    "timezone": "America/Sao_Paulo",
+    "dc_capacity_kwp": 1200.54,
+    "ac_capacity_kw": 1000.0,
+    "modules": 2244,
+    "modules_per_string": 22,
+    "tilt_deg": 22.0,
+    "azimuth_deg": 0.0,
+    "albedo": 0.2,
+    "inverters": [
+      {
+        "inverter_id": "INV-01",
+        "ac_capacity_kw": 250.0,
+        "dc_max_kw": 330.0,
+        "mppt_count": 12,
+        "max_voltage_v": 1100.0,
+        "mppt_min_voltage_v": 500.0,
+        "mppt_max_voltage_v": 850.0,
+        "efficiency_pct": 98.5
+      },
+      {
+        "inverter_id": "INV-02",
+        "ac_capacity_kw": 250.0,
+        "dc_max_kw": 330.0,
+        "mppt_count": 12,
+        "max_voltage_v": 1100.0,
+        "mppt_min_voltage_v": 500.0,
+        "mppt_max_voltage_v": 850.0,
+        "efficiency_pct": 98.5
+      },
+      {
+        "inverter_id": "INV-03",
+        "ac_capacity_kw": 250.0,
+        "dc_max_kw": 330.0,
+        "mppt_count": 12,
+        "max_voltage_v": 1100.0,
+        "mppt_min_voltage_v": 500.0,
+        "mppt_max_voltage_v": 850.0,
+        "efficiency_pct": 98.5
+      },
+      {
+        "inverter_id": "INV-04",
+        "ac_capacity_kw": 250.0,
+        "dc_max_kw": 330.0,
+        "mppt_count": 12,
+        "max_voltage_v": 1100.0,
+        "mppt_min_voltage_v": 500.0,
+        "mppt_max_voltage_v": 850.0,
+        "efficiency_pct": 98.5
+      }
+    ]
+  },
+  "performance": {
+    "installed_dc_kwp": 1200.54,
+    "installed_ac_kw": 1000.0,
+    "dc_ac_ratio": 1.20054,
+    "annual_generation_kwh": 2190667.365472771,
+    "total_generation_kwh": 4381334.730945542,
+    "expected_total_kwh": 4418774.483670192,
+    "performance_ratio": 0.8331485097355814,
+    "specific_yield_kwh_kwp": 1824.7350071407627,
+    "final_yield_kwh_kwp": 1824.7350071407627,
+    "reference_yield_kwh_m2": 2190.1677621915014,
+    "capacity_factor": 0.2497340817912416,
+    "availability": 0.991527118466215,
+    "clipping_kwh": 10232.24204250762,
+    "curtailment_kwh": 2611.5616513478744
+  },
+  "digital_twin": {
+    "mae_kw": 8.970862331621651,
+    "rmse_kw": 33.26282353575499,
+    "nrmse_pct": 3.3262823535754995,
+    "mbe_kw": -4.380968023010578,
+    "r2": 0.9864998690924269
+  },
+  "anomaly_detection": {
+    "precision": 0.40484048404840484,
+    "recall": 0.43861740166865315,
+    "f1": 0.42105263157894735
+  },
+  "economics": {
+    "baseline_cost_brl": 3660821.0786890434,
+    "scenario_cost_brl": 2527545.0756508554,
+    "annual_savings_brl": 1180710.800431282,
+    "capex_brl": 4946539.0,
+    "opex_brl_year": 73297.68,
+    "npv_brl": 15972481.181470752,
+    "irr": 0.49499799783774456,
+    "payback_years": 2.118398820227535,
+    "discounted_payback_years": 2.4937320302642854,
+    "lcos_brl_kwh": 0.43648424723860973,
+    "degradation_cost_brl_year": 59046.838821459
+  },
+  "best_bess": {
+    "pv_kwp": 1200.54,
+    "bess_kw": 250.0,
+    "bess_kwh": 750.0,
+    "annual_pv_kwh": 2190667.365472771,
+    "peak_demand_kw": 850.0,
+    "peak_reduction_kw": 106.12499619853156,
+    "self_consumption_pct": 1.0,
+    "capex_brl": 4484039.0,
+    "annual_savings_brl": 1182405.521414551,
+    "npv_brl": 16580065.422445549,
+    "irr": 0.545902307862346,
+    "payback_years": 1.9187402670798015,
+    "lcos_brl_kwh": 0.46588818520415043
+  },
+  "optimizer_validation": {
+    "success": true,
+    "objective_brl": 11148.0122577622,
+    "horizon_h": 48
+  },
+  "bess": {
+    "throughput_kwh": 3374105.0755119426,
+    "equivalent_cycles": 1687.0525377559713,
+    "peak_reduction_kw": 106.12499619853156,
+    "self_consumption_before_pct": 0.9025747013543268,
+    "self_consumption_after_pct": 1.0,
+    "self_sufficiency_after_pct": 0.5051194659164023,
+    "max_balance_error_kwh": 1.7053025658242404e-13
+  },
+  "losses": [
+    {
+      "loss": "Soiling",
+      "kwh": 115509.52927153558,
+      "mwh": 115.50952927153557,
+      "pct_of_available": 0.022988531756493392,
+      "brl": 71615.90814835206
+    },
+    {
+      "loss": "Perdas opticas",
+      "kwh": 87966.37770091908,
+      "mwh": 87.96637770091908,
+      "pct_of_available": 0.017506935402078514,
+      "brl": 54539.15417456983
+    },
+    {
+      "loss": "Cabos DC",
+      "kwh": 73305.31475076592,
+      "mwh": 73.30531475076592,
+      "pct_of_available": 0.014589112835065431,
+      "brl": 45449.29514547487
+    },
+    {
+      "loss": "Conversao inversor",
+      "kwh": 67446.80292963507,
+      "mwh": 67.44680292963507,
+      "pct_of_available": 0.013423160676007967,
+      "brl": 41817.017816373744
+    },
+    {
+      "loss": "Mismatch",
+      "kwh": 58644.251800612736,
+      "mwh": 58.644251800612736,
+      "pct_of_available": 0.011671290268052345,
+      "brl": 36359.4361163799
+    }
+  ]
+}

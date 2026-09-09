@@ -1,0 +1,12 @@
+A geracao anual calculada foi 2190.7 MWh/ano.
+O PR calculado foi 0.833, usando Yf/Yr.
+O specific yield foi 1824.7 kWh/kWp.ano.
+A maior perda anual foi Soiling com 57.8 MWh/ano.
+O clipping total medio anual foi 5.1 MWh/ano.
+O curtailment medio anual foi 1.3 MWh/ano.
+O melhor BESS por NPV na grade foi 250 kW / 750 kWh.
+A reducao de pico com BESS base foi 106.1 kW.
+O autoconsumo subiu de 90.3% para 100.0%.
+O LCOS calculado do BESS base foi R$ 0.44/kWh descarregado.
+O VPL do caso base PV+BESS foi R$ 15,972,481.
+A TIR do caso base foi 49.5%.

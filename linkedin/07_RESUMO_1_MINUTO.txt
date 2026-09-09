@@ -1,0 +1,1 @@
+Projeto flagship de engenharia solar FV: pvlib para recurso e modelo fisico, dados sinteticos classificados, Digital Twin, deteccao de anomalias, O&M, BESS com SOC/degradacao, dispatch, sizing, VPL, TIR, payback e LCOS.
