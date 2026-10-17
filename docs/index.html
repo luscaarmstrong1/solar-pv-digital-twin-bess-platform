@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gêmeo Digital Fotovoltaico & Otimização BESS | Lucas Santos Engenharia</title>
+  <meta name="description" content="Plataforma analítica de gêmeo digital fotovoltaico (1,20 MWp), diagnóstico operacional O&M, decomposição de perdas e otimização técnico-econômica de armazenamento BESS (250 kW / 750 kWh) em Python, pvlib, FastAPI e Streamlit." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy-deep: #071827;
+      --navy-tech: #102B42;
+      --navy-card: #0d2236;
+      --gold: #D3A15C;
+      --gold-light: #e4bc82;
+      --cream: #F4F6F3;
+      --text-muted: #9eb2c4;
+      --border: rgba(211, 161, 92, 0.24);
+      --success: #34d399;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: radial-gradient(circle at 85% 10%, rgba(211, 161, 92, 0.12), transparent 40%), var(--navy-deep);
+      color: var(--cream);
+      line-height: 1.6;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 5vw;
+      background: rgba(7, 24, 39, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--cream);
+    }
+    .brand-mark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: 0.04em;
+      color: var(--gold);
+    }
+    .brand-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+    .brand-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: var(--cream);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .nav-link:hover {
+      border-color: var(--border);
+      color: var(--gold);
+    }
+    .nav-cta {
+      background: var(--gold);
+      color: var(--navy-deep);
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+    .nav-cta:hover {
+      background: var(--gold-light);
+      color: var(--navy-deep);
+    }
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 5vw;
+    }
+    .hero {
+      padding: 56px 0 36px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(211, 161, 92, 0.1);
+      border: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 0.98;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+      letter-spacing: 0.01em;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 1.4vw, 1.18rem);
+      color: var(--text-muted);
+      max-width: 78ch;
+      margin: 0 0 24px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .tech-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      padding: 5px 12px;
+      border-radius: 6px;
+      background: rgba(16, 43, 66, 0.9);
+      border: 1px solid rgba(211, 161, 92, 0.25);
+      color: var(--cream);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .kpi-card {
+      background: linear-gradient(160deg, rgba(16, 43, 66, 0.92), rgba(7, 24, 39, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .kpi-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    .kpi-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.05;
+    }
+    .kpi-detail {
+      font-size: 0.82rem;
+      color: var(--cream);
+      opacity: 0.85;
+    }
+    section {
+      padding: 48px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .section-head {
+      margin-bottom: 28px;
+    }
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1.8rem, 3.2vw, 2.7rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin: 0;
+    }
+    .sim-shell {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      background: rgba(16, 43, 66, 0.55);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 26px;
+    }
+    @media (max-width: 920px) {
+      .sim-shell { grid-template-columns: 1fr; padding: 18px; }
+    }
+    .sim-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: rgba(7, 24, 39, 0.85);
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .sim-control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .sim-control-header label {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+    .sim-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--gold);
+      background: rgba(211, 161, 92, 0.12);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+    .sim-output {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .sim-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 12px;
+    }
+    .sim-metric-box {
+      background: rgba(7, 24, 39, 0.9);
+      border: 1px solid rgba(211, 161, 92, 0.22);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .sim-metric-box span {
+      display: block;
+      font-size: 0.74rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .sim-metric-box strong {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.75rem;
+      color: var(--gold);
+      margin-top: 4px;
+    }
+    .sim-chart-box {
+      background: rgba(7, 24, 39, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .sim-chart-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .eq-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .eq-index {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+    .eq-card h4 {
+      margin: 6px 0 10px;
+      font-size: 1rem;
+    }
+    .eq-card code {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      color: var(--gold-light);
+      background: rgba(7, 24, 39, 0.9);
+      padding: 10px 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .arch-step {
+      background: rgba(16, 43, 66, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .arch-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .arch-step p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--cream);
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .shot-card {
+      margin: 0;
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform 0.25s ease;
+    }
+    .shot-card:hover {
+      transform: translateY(-4px);
+    }
+    .shot-frame {
+      background: #040d17;
+      aspect-ratio: 16 / 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .shot-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .shot-card figcaption {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .shot-idx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gold);
+      background: rgba(211, 161, 92, 0.14);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    footer {
+      padding: 44px 0 60px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .footer-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+    }
+    .footer-author strong {
+      color: var(--cream);
+      font-size: 1.05rem;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="https://lucas-santos-portfolio-zeta.vercel.app/">
+      <span class="brand-mark">LUCAS SANTOS</span>
+      <span class="brand-divider"></span>
+      <span class="brand-sub">Camada 01 • DIGITAL TWIN & BESS</span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="#simulador">Simulador Interativo</a>
+      <a class="nav-link" href="#arquitetura">Equações & Arquitetura</a>
+      <a class="nav-link" href="#galeria">Telas & Gráficos</a>
+      <a class="nav-link" href="https://lucas-santos-portfolio-zeta.vercel.app/#arquitetura">Portfólio Principal</a>
+      <a class="nav-link nav-cta" href="https://github.com/luscaarmstrong1/solar-pv-digital-twin-bess-platform" target="_blank" rel="noopener">Código no GitHub ↗</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow">CAMADA 01 • Engenharia Solar • Digital Twin • Armazenamento BESS</div>
+      <h1>Gêmeo Digital Fotovoltaico & Otimização BESS</h1>
+      <p class="hero-sub">Modelagem física de 1,20 MWp, monitoramento horário Expected vs. Observed, árvore de perdas O&M e despacho ótimo de baterias (250 kW / 750 kWh).</p>
+      <div class="badge-row"><span class="tech-badge">Python 3.11+</span><span class="tech-badge">pvlib</span><span class="tech-badge">FastAPI</span><span class="tech-badge">Streamlit</span><span class="tech-badge">BESS Dispatch</span><span class="tech-badge">LCOS & VPL</span></div>
+      <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Planta Fotovoltaica</span>
+        <strong class="kpi-value">1,20 MWp</strong>
+        <span class="kpi-detail">Modelagem física horária AC/DC</span>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Sistema BESS</span>
+        <strong class="kpi-value">250 kW / 750 kWh</strong>
+        <span class="kpi-detail">Controle de SOC & arbitragem</span>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Performance Ratio</span>
+        <strong class="kpi-value">82,4%</strong>
+        <span class="kpi-detail">Rastreamento Expected vs Observed</span>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Árvore de Perdas</span>
+        <strong class="kpi-value">6 Camadas</strong>
+        <span class="kpi-detail">Térmica, sujidade, clipping e O&M</span>
+      </div></div>
+    </section>
+
+    <section id="simulador">
+      <div class="section-head">
+        <span class="section-tag">MODELAGEM INTERATIVA EM TEMPO REAL</span>
+        <h2 class="section-title">Simulador Paramétrico de Engenharia</h2>
+      </div>
+      <div class="sim-shell">
+        <div class="sim-controls">
+          
+      <div class="sim-control">
+        <div class="sim-control-header">
+          <label for="ctrl-mwp">Potência Instalada FV (MWp)</label>
+          <span class="sim-val" id="val-mwp">1.2</span>
+        </div>
+        <input type="range" id="ctrl-mwp" min="0.5" max="5" step="0.1" value="1.2" />
+      </div>
+
+      <div class="sim-control">
+        <div class="sim-control-header">
+          <label for="ctrl-pr">Performance Ratio Base (%)</label>
+          <span class="sim-val" id="val-pr">82.5</span>
+        </div>
+        <input type="range" id="ctrl-pr" min="70" max="90" step="0.5" value="82.5" />
+      </div>
+
+      <div class="sim-control">
+        <div class="sim-control-header">
+          <label for="ctrl-bess">Capacidade Útil BESS (kWh)</label>
+          <span class="sim-val" id="val-bess">750</span>
+        </div>
+        <input type="range" id="ctrl-bess" min="250" max="3000" step="50" value="750" />
+      </div>
+
+      <div class="sim-control">
+        <div class="sim-control-header">
+          <label for="ctrl-spread">Spread Tarifário Ponta/Fora (R$/MWh)</label>
+          <span class="sim-val" id="val-spread">520</span>
+        </div>
+        <input type="range" id="ctrl-spread" min="250" max="900" step="25" value="520" />
+      </div>
+        </div>
+        <div class="sim-output">
+          <div class="sim-metrics" id="sim-metrics"></div>
+          <div class="sim-chart-box">
+            <div class="sim-chart-title">
+              <span id="chart-title">CURVA OPERACIONAL E ECONÔMICA SIMULADA</span>
+              <span id="chart-subtitle">Cálculo determinístico instantâneo</span>
+            </div>
+            <div id="svg-chart-container"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="arquitetura">
+      <div class="section-head">
+        <span class="section-tag">FUNDAMENTAÇÃO FÍSICA E MATEMÁTICA</span>
+        <h2 class="section-title">Equações & Arquitetura do Sistema</h2>
+      </div>
+      <div class="eq-grid">
+      <div class="eq-card">
+        <span class="eq-index">EQUAÇÃO 01</span>
+        <h4>Potência CC e Correção Térmica</h4>
+        <code>P_DC(t) = P_STC · (G_POA(t) / 1000) · [1 + γ · (T_cell(t) - 25°C)]</code>
+      </div>
+
+      <div class="eq-card">
+        <span class="eq-index">EQUAÇÃO 02</span>
+        <h4>Dinâmica de Estado de Carga (SOC BESS)</h4>
+        <code>SOC(t+1) = SOC(t) + [η_ch · P_ch(t) - P_dis(t) / η_dis] · (Δt / E_nom)</code>
+      </div>
+
+      <div class="eq-card">
+        <span class="eq-index">EQUAÇÃO 03</span>
+        <h4>Levelized Cost of Storage (LCOS)</h4>
+        <code>LCOS = [CAPEX_BESS + Σ (OPEX_t + C_ch,t) / (1+r)^t] / [Σ E_dis,t / (1+r)^t]</code>
+      </div></div>
+      <div class="arch-grid">
+      <div class="arch-step">
+        <div class="arch-num">01</div>
+        <p>Recurso Solar & Telemetria Horária (GHI, DNI, Temperatura Ambiente e Vento)</p>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-num">02</div>
+        <p>Gêmeo Digital Físico FV (Transposição POA, Temperatura de Célula, Inversor e Clipping)</p>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-num">03</div>
+        <p>Diagnóstico de Performance & O&M (Árvore de Perdas, Detecção de Falhas e Strings)</p>
+      </div>
+
+      <div class="arch-step">
+        <div class="arch-num">04</div>
+        <p>Despacho Inteligente BESS & Viabilidade (Peak Shaving, Arbitragem Tarifária, LCOS e VPL)</p>
+      </div></div>
+    </section>
+
+    <section id="galeria">
+      <div class="section-head">
+        <span class="section-tag">EVIDÊNCIAS VISUAIS E DASHBOARDS</span>
+        <h2 class="section-title">Telas e Resultados Analíticos do Projeto</h2>
+      </div>
+      <div class="gallery-grid">
+      <figure class="shot-card">
+        <div class="shot-frame">
+          <img src="assets/screenshots/01_executive.png" alt="Visão Executiva da Usina & KPIs" loading="lazy" />
+        </div>
+        <figcaption>
+          <span class="shot-idx">01</span>
+          <span>Visão Executiva da Usina & KPIs</span>
+        </figcaption>
+      </figure>
+
+      <figure class="shot-card">
+        <div class="shot-frame">
+          <img src="assets/screenshots/02_digital_twin.png" alt="Gêmeo Digital: Esperado vs. Observado" loading="lazy" />
+        </div>
+        <figcaption>
+          <span class="shot-idx">02</span>
+          <span>Gêmeo Digital: Esperado vs. Observado</span>
+        </figcaption>
+      </figure>
+
+      <figure class="shot-card">
+        <div class="shot-frame">
+          <img src="assets/screenshots/05_losses.png" alt="Decomposição da Árvore de Perdas" loading="lazy" />
+        </div>
+        <figcaption>
+          <span class="shot-idx">03</span>
+          <span>Decomposição da Árvore de Perdas</span>
+        </figcaption>
+      </figure>
+
+      <figure class="shot-card">
+        <div class="shot-frame">
+          <img src="assets/screenshots/09_bess.png" alt="Operação e Estado de Carga BESS" loading="lazy" />
+        </div>
+        <figcaption>
+          <span class="shot-idx">04</span>
+          <span>Operação e Estado de Carga BESS</span>
+        </figcaption>
+      </figure>
+
+      <figure class="shot-card">
+        <div class="shot-frame">
+          <img src="assets/screenshots/10_dispatch.png" alt="Despacho Horário Integrado FV + BESS" loading="lazy" />
+        </div>
+        <figcaption>
+          <span class="shot-idx">05</span>
+          <span>Despacho Horário Integrado FV + BESS</span>
+        </figcaption>
+      </figure>
+
+      <figure class="shot-card">
+        <div class="shot-frame">
+          <img src="assets/screenshots/12_economics.png" alt="Análise Econômica, LCOS e VPL" loading="lazy" />
+        </div>
+        <figcaption>
+          <span class="shot-idx">06</span>
+          <span>Análise Econômica, LCOS e VPL</span>
+        </figcaption>
+      </figure></div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <div class="footer-box">
+      <div class="footer-author">
+        <strong>Lucas Silva Santos • Engenheiro Eletricista & Gerente de Projetos</strong>
+        <span>Energia • Dados • Inteligência Artificial • Automação • São João da Boa Vista, SP • Itajubá, MG</span>
+      </div>
+      <div class="nav-links">
+        <a class="nav-link" href="https://lucas-santos-portfolio-zeta.vercel.app/">Portfólio</a>
+        <a class="nav-link" href="https://www.linkedin.com/in/lucasssantos1/" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="nav-link nav-cta" href="https://github.com/luscaarmstrong1/solar-pv-digital-twin-bess-platform" target="_blank" rel="noopener">Explorar Repositório ↗</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SIM_TYPE = "digital_twin";
+    const fmtBRL = (n) => "R$ " + Number(n).toLocaleString("pt-BR", { maximumFractionDigits: 0 });
+    const fmtNum = (n, d = 1) => Number(n).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+    function renderSvgBars(labels, seriesA, seriesB, labelA, labelB) {
+      const w = 680, h = 230, padL = 44, padR = 18, padT = 22, padB = 34;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+      const maxVal = Math.max(...seriesA, ...(seriesB || [0]), 1) * 1.12;
+      const n = labels.length;
+      const step = plotW / n;
+      let bars = "";
+      for (let i = 0; i < n; i++) {
+        const xCenter = padL + i * step + step / 2;
+        const bw = seriesB ? Math.max(6, step * 0.34) : Math.max(10, step * 0.56);
+        const hA = Math.max(2, (seriesA[i] / maxVal) * plotH);
+        const yA = padT + plotH - hA;
+        const xA = seriesB ? xCenter - bw - 1 : xCenter - bw / 2;
+        bars += `<rect x="${xA.toFixed(1)}" y="${yA.toFixed(1)}" width="${bw.toFixed(1)}" height="${hA.toFixed(1)}" rx="3" fill="#D3A15C" opacity="0.92" />`;
+        if (seriesB) {
+          const hB = Math.max(2, (seriesB[i] / maxVal) * plotH);
+          const yB = padT + plotH - hB;
+          const xB = xCenter + 1;
+          bars += `<rect x="${xB.toFixed(1)}" y="${yB.toFixed(1)}" width="${bw.toFixed(1)}" height="${hB.toFixed(1)}" rx="3" fill="#38bdf8" opacity="0.88" />`;
+        }
+        if (i % Math.ceil(n / 12) === 0) {
+          bars += `<text x="${xCenter.toFixed(1)}" y="${h - 10}" fill="#9eb2c4" font-size="10" font-family="JetBrains Mono" text-anchor="middle">${labels[i]}</text>`;
+        }
+      }
+      const grid = [0.25, 0.5, 0.75, 1].map(f => {
+        const y = padT + plotH * (1 - f);
+        const val = (maxVal * f).toFixed(0);
+        return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3 3" />
+                <text x="${padL - 6}" y="${(y + 3).toFixed(1)}" fill="#9eb2c4" font-size="9.5" font-family="JetBrains Mono" text-anchor="end">${val}</text>`;
+      }).join("");
+      const legend = `<g transform="translate(${padL}, 12)">
+        <rect x="0" y="-8" width="10" height="10" rx="2" fill="#D3A15C" />
+        <text x="14" y="0" fill="#F4F6F3" font-size="10.5" font-family="JetBrains Mono">${labelA}</text>
+        ${seriesB ? `<rect x="180" y="-8" width="10" height="10" rx="2" fill="#38bdf8" /><text x="194" y="0" fill="#F4F6F3" font-size="10.5" font-family="JetBrains Mono">${labelB}</text>` : ""}
+      </g>`;
+      return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="auto" role="img">${grid}${bars}${legend}</svg>`;
+    }
+
+    function updateSimulation() {
+      const getVal = (id) => {
+        const el = document.getElementById("ctrl-" + id);
+        const v = el ? parseFloat(el.value) : 0;
+        const lbl = document.getElementById("val-" + id);
+        if (lbl) lbl.textContent = v.toLocaleString("pt-BR");
+        return v;
+      };
+
+      let metrics = [];
+      let svg = "";
+
+      if (SIM_TYPE === "digital_twin") {
+        const mwp = getVal("mwp");
+        const pr = getVal("pr") / 100;
+        const bess = getVal("bess");
+        const spread = getVal("spread");
+        const genMwh = mwp * 5.15 * 365 * pr;
+        const bessMwhYr = (bess * 0.88 * 330) / 1000;
+        const revArbitrage = bessMwhYr * spread;
+        const lcos = Math.max(290, 680 - (bess / 30) - (spread * 0.15));
+        metrics = [
+          { label: "Geração Esperada FV", value: fmtNum(genMwh, 0) + " MWh/ano" },
+          { label: "Energia Despachada BESS", value: fmtNum(bessMwhYr, 0) + " MWh/ano" },
+          { label: "Receita de Arbitragem", value: fmtBRL(revArbitrage) + "/ano" },
+          { label: "LCOS Estimado", value: "R$ " + fmtNum(lcos, 0) + "/MWh" },
+        ];
+        const hrs = Array.from({ length: 12 }, (_, i) => (i * 2 + 6) + "h");
+        const pvCurve = [0.05, 0.28, 0.68, 0.95, 1.0, 0.88, 0.54, 0.15, 0.0, 0.0, 0.0, 0.0].map(f => +(f * mwp * pr * 1000).toFixed(0));
+        const bessCurve = [0, 0, 0, 0, 0, 0, 40, +(bess * 0.38).toFixed(0), +(bess * 0.45).toFixed(0), +(bess * 0.18).toFixed(0), 0, 0];
+        svg = renderSvgBars(hrs, pvCurve, bessCurve, "Geração FV (kW)", "Despacho BESS Ponta (kW)");
+      } else if (SIM_TYPE === "energy_ai") {
+        const baseLoad = getVal("baseLoad");
+        const solarCap = getVal("solarCap");
+        const shiftPct = getVal("shiftPct") / 100;
+        const sigma = getVal("sigma");
+        const peakRedMw = baseLoad * 1.25 * shiftPct;
+        const annualSavings = (peakRedMw * 1000 * 480 * 12) * 0.42 + (solarCap * 1650 * 420);
+        const anomalies = Math.max(3, Math.round(48 / sigma));
+        metrics = [
+          { label: "Redução na Ponta", value: fmtNum(peakRedMw, 2) + " MW" },
+          { label: "Economia Otimizada", value: fmtBRL(annualSavings) + "/ano" },
+          { label: "Eventos Anômalos/Ano", value: anomalies + " alertas" },
+          { label: "Acurácia Forecasting", value: "97,2% (1-MAPE)" },
+        ];
+        const hrs = ["02h","04h","06h","08h","10h","12h","14h","16h","18h","20h","22h","24h"];
+        const orig = [0.7,0.68,0.75,0.92,1.05,1.08,1.1,1.12,1.32,1.35,1.05,0.82].map(f => +(f * baseLoad).toFixed(2));
+        const opt = [0.78,0.76,0.82,0.95,0.98,0.92,0.94,1.02,1.32*(1-shiftPct),1.35*(1-shiftPct),1.08,0.88].map(v => +v.toFixed(2));
+        svg = renderSvgBars(hrs, orig, opt, "Carga Base (MW)", "Carga Otimizada IA (MW)");
+      } else if (SIM_TYPE === "power_system") {
+        const loadGrowth = getVal("loadGrowth");
+        const solarWindAdd = getVal("solarWindAdd");
+        const hydroStorage = getVal("hydroStorage");
+        const mmgdAdd = getVal("mmgdAdd");
+        const totalCap = 206 + solarWindAdd + mmgdAdd;
+        const renShare = Math.min(94.5, 86.5 + (solarWindAdd + mmgdAdd) * 0.25);
+        const pldEst = Math.max(69, 340 - hydroStorage * 2.6 - solarWindAdd * 2.2);
+        metrics = [
+          { label: "Capacidade SIN + MMGD", value: fmtNum(totalCap, 1) + " GW" },
+          { label: "Participação Renovável", value: fmtNum(renShare, 1) + "%" },
+          { label: "Expansão Anual Limpa", value: "+" + fmtNum(solarWindAdd + mmgdAdd, 1) + " GW" },
+          { label: "PLD Médio Estimado", value: "R$ " + fmtNum(pldEst, 0) + "/MWh" },
+        ];
+        const subs = ["Hídrica", "Eólica", "Solar Central.", "MMGD Solar", "Biomassa", "Térmica"];
+        const gwBase = [109, 31 + solarWindAdd * 0.45, 16 + solarWindAdd * 0.55, 33 + mmgdAdd, 17, 29];
+        const gwEff = gwBase.map((v, i) => +(v * [0.52, 0.42, 0.27, 0.21, 0.45, (100 - hydroStorage) * 0.006][i]).toFixed(1));
+        svg = renderSvgBars(subs, gwBase, gwEff, "Capacidade Instalada (GW)", "Geração Média (GWmed)");
+      } else if (SIM_TYPE === "solar_feasibility") {
+        const consumo = getVal("consumo");
+        const tarifa = getVal("tarifa");
+        const hsp = getVal("hsp");
+        const capexUnit = getVal("capexUnit");
+        const kwp = (consumo / 30) / (hsp * 0.79);
+        const capex = kwp * capexUnit;
+        const ecoAno1 = consumo * 12 * 0.92 * tarifa;
+        const payback = capex / ecoAno1;
+        const vpl = ecoAno1 * 10.6 - capex;
+        metrics = [
+          { label: "Potência Recomendada", value: fmtNum(kwp, 1) + " kWp" },
+          { label: "CAPEX Estimado", value: fmtBRL(capex) },
+          { label: "Payback Simples", value: fmtNum(payback, 1) + " anos" },
+          { label: "VPL (25 Anos)", value: fmtBRL(vpl) },
+        ];
+        const yrs = ["A1","A3","A5","A7","A10","A13","A16","A19","A22","A25"];
+        const gen = [1,3,5,7,10,13,16,19,22,25].map(y => Math.round((ecoAno1 * y * 0.94) / 1000));
+        const costLine = yrs.map(() => Math.round(capex / 1000));
+        svg = renderSvgBars(yrs, gen, costLine, "Economia Acumulada (R$ mil)", "Investimento CAPEX (R$ mil)");
+      } else if (SIM_TYPE === "mercado_livre") {
+        const consumoMwh = getVal("consumoMwh");
+        const demandaKw = getVal("demandaKw");
+        const tarifaAcr = getVal("tarifaAcr");
+        const precoAcl = getVal("precoAcl");
+        const fioAnual = demandaKw * 34 * 12;
+        const custoAcr = consumoMwh * 12 * tarifaAcr + fioAnual * 1.45;
+        const custoAcl = consumoMwh * 12 * (precoAcl + 28) + fioAnual * 0.72;
+        const ecoAnual = Math.max(0, custoAcr - custoAcl);
+        const pct = (ecoAnual / custoAcr) * 100;
+        metrics = [
+          { label: "Custo Anual ACR", value: fmtBRL(custoAcr) },
+          { label: "Custo Anual ACL", value: fmtBRL(custoAcl) },
+          { label: "Economia Anual", value: fmtBRL(ecoAnual) + " (" + fmtNum(pct, 1) + "%)" },
+          { label: "Economia em 5 Anos", value: fmtBRL(ecoAnual * 5.45) },
+        ];
+        const anos = ["Ano 1", "Ano 2", "Ano 3", "Ano 4", "Ano 5"];
+        const sAcr = [1, 1.06, 1.12, 1.19, 1.26].map(f => Math.round((custoAcr * f) / 1000));
+        const sAcl = [1, 1.04, 1.08, 1.13, 1.18].map(f => Math.round((custoAcl * f) / 1000));
+        svg = renderSvgBars(anos, sAcr, sAcl, "Custo Cativo ACR (R$ mil)", "Custo Livre ACL (R$ mil)");
+      } else if (SIM_TYPE === "green_hydrogen") {
+        const renMw = getVal("renMw");
+        const elecMw = getVal("elecMw");
+        const sec = getVal("sec");
+        const capexElec = getVal("capexElec");
+        const energyMwh = Math.min(renMw * 0.44, elecMw * 0.76) * 8760;
+        const h2Tons = (energyMwh * 1000) / sec / 1000;
+        const lcoh = Math.max(2.4, ((elecMw * capexElec * 1000 * 0.14) + energyMwh * 32) / (h2Tons * 1000));
+        const co2Avoided = h2Tons * 9.8;
+        metrics = [
+          { label: "Produção Anual H₂V", value: fmtNum(h2Tons, 0) + " ton/ano" },
+          { label: "LCOH Estimado", value: "US$ " + fmtNum(lcoh, 2) + "/kg" },
+          { label: "Emissões Evitadas", value: fmtNum(co2Avoided, 0) + " tCO₂/ano" },
+          { label: "Fator Capacidade PEM", value: fmtNum((energyMwh / (elecMw * 8760)) * 100, 1) + "%" },
+        ];
+        const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+        const h2M = [0.95,0.92,0.98,1.02,1.05,1.08,1.12,1.15,1.1,1.04,0.98,0.96].map(f => Math.round((h2Tons / 12) * f));
+        svg = renderSvgBars(meses, h2M, null, "Produção Mensal de H₂ Verde (toneladas)", "");
+      } else if (SIM_TYPE === "project_mgmt") {
+        const projCount = getVal("projCount");
+        const avgKwp = getVal("avgKwp");
+        const slaPct = getVal("slaPct");
+        const leadDays = getVal("leadDays");
+        const totalMwp = (projCount * avgKwp) / 1000;
+        const onTime = Math.round(projCount * (slaPct / 100));
+        const revEst = projCount * (3800 + avgKwp * 28);
+        metrics = [
+          { label: "Potência Total Carteira", value: fmtNum(totalMwp, 2) + " MWp" },
+          { label: "Projetos Dentro do SLA", value: onTime + " / " + projCount },
+          { label: "Ciclo Médio Conexão", value: leadDays + " dias" },
+          { label: "Receita de Engenharia", value: fmtBRL(revEst) },
+        ];
+        const etapas = ["Levantamento", "Projeto Executivo", "Parecer Acesso", "Adequação/Obras", "Vistoria", "Homologado"];
+        const dist = [0.12, 0.18, 0.24, 0.16, 0.10, 0.20].map(f => Math.round(projCount * f));
+        svg = renderSvgBars(etapas, dist, null, "Projetos por Etapa Operacional (unid)", "");
+      } else if (SIM_TYPE === "energy_mgmt") {
+        const indConsumo = getVal("indConsumo");
+        const peakDemand = getVal("peakDemand");
+        const solarShare = getVal("solarShare") / 100;
+        const effTarget = getVal("effTarget") / 100;
+        const gridMwh = indConsumo * (1 - solarShare) * (1 - effTarget);
+        const monthlyBill = gridMwh * 640 + peakDemand * (1 - effTarget * 0.6) * 42;
+        const annualSavings = (indConsumo * 640 * 12) - (monthlyBill * 12);
+        metrics = [
+          { label: "Consumo Rede Líquido", value: fmtNum(gridMwh, 1) + " MWh/mês" },
+          { label: "Fatura Mensal Otimizada", value: fmtBRL(monthlyBill) },
+          { label: "Economia Anual Total", value: fmtBRL(annualSavings) + "/ano" },
+          { label: "Redução de Pegada CO₂", value: fmtNum((indConsumo - gridMwh) * 12 * 0.082, 1) + " tCO₂/ano" },
+        ];
+        const hrs = ["02h","04h","06h","08h","10h","12h","14h","16h","18h","20h","22h","24h"];
+        const baseD = [0.55,0.52,0.62,0.88,0.96,0.94,0.98,0.95,1.0,0.92,0.74,0.60].map(f => Math.round(f * peakDemand));
+        const optD = baseD.map((v, i) => Math.round(v * (1 - effTarget) * (i >= 4 && i <= 7 ? (1 - solarShare * 0.55) : 1)));
+        svg = renderSvgBars(hrs, baseD, optD, "Demanda Original (kW)", "Demanda Líquida com Solar + Eficiência (kW)");
+      } else if (SIM_TYPE === "pv_sizing") {
+        const monthKwh = getVal("monthKwh");
+        const hspDay = getVal("hspDay");
+        const modWp = getVal("modWp");
+        const prVal = getVal("prVal") / 100;
+        const reqKwp = (monthKwh / 30) / (hspDay * prVal);
+        const nMods = Math.ceil((reqKwp * 1000) / modWp);
+        const instKwp = (nMods * modWp) / 1000;
+        const invKw = +(instKwp / 1.18).toFixed(1);
+        const genYear = instKwp * hspDay * prVal * 365;
+        metrics = [
+          { label: "Potência Instalada", value: fmtNum(instKwp, 2) + " kWp" },
+          { label: "Arranjo de Módulos", value: nMods + " × " + modWp + " Wp" },
+          { label: "Inversor Sugerido", value: fmtNum(invKw, 1) + " kW (FDI 1,18)" },
+          { label: "Geração Anual", value: fmtNum(genYear, 0) + " kWh/ano" },
+        ];
+        const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+        const saz = [1.08,1.06,1.04,0.96,0.88,0.84,0.86,0.96,1.02,1.08,1.11,1.11].map(f => Math.round((genYear / 12) * f));
+        const cons = meses.map(() => Math.round(monthKwh));
+        svg = renderSvgBars(meses, saz, cons, "Geração Mensal Estimada (kWh)", "Consumo Mensal (kWh)");
+      }
+
+      document.getElementById("sim-metrics").innerHTML = metrics
+        .map(m => `<div class="sim-metric-box"><span>${m.label}</span><strong>${m.value}</strong></div>`)
+        .join("");
+      document.getElementById("svg-chart-container").innerHTML = svg;
+    }
+
+    document.querySelectorAll('input[type="range"]').forEach(el => {
+      el.addEventListener("input", updateSimulation);
+    });
+    updateSimulation();
+  </script>
+</body>
+</html>
